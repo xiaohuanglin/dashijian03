@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>文章列表</title>
+    <link rel="stylesheet" href="js/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/iconfont.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <script src="js/jquery-1.12.4.min.js"></script>
+  </head>
+
+  <body>
+    <div class="container-fluid">
+      <div class="common_title">
+        用户信息修改
+      </div>
+      <div class="container-fluid common_con">
+        <form class="form-horizontal article_form">
+          <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label"
+              >用户名称：</label
+            >
+            <div class="col-sm-4">
+              <input
+                name="username"
+                type="text"
+                class="form-control username"
+                id="inputEmail3"
+                value="李思思"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label"
+              >昵称：</label
+            >
+            <div class="col-sm-4">
+              <input
+                type="text"
+                name="nickname"
+                class="form-control  nickname"
+                id="inputEmail3"
+                value="思思"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label"
+              >邮箱：</label
+            >
+            <div class="col-sm-4">
+              <input
+                type="text"
+                name="email"
+                class="form-control email"
+                id="inputEmail3"
+                value="lisisi@126.com"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputPassword3" class="col-sm-2 control-label"
+              >用户图标：</label
+            >
+            <div class="col-sm-10">
+              <img src="images/2.jpg" alt="" class="user_pic" />
+              <input type="file" id="exampleInputFile" name="userPic" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label"
+              >密码：</label
+            >
+            <div class="col-sm-4">
+              <input
+                type="password"
+                name="password"
+                class="form-control password"
+                id="inputEmail3"
+                value="12345678"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <button type="submit" class="btn btn-success btn-edit">
+                修改
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script>
+      // 入口函数
+      $(function() {
+        //   先给input 一个值改变事件
+        $("#exampleInputFile").on("change", function() {
+          // 获取选中的元素
+          var icon = this.files[0];
+          // 创建一个url
+          var url = URL.createObjectURL(icon);
+          // 将这个url 给img 的src 属性
+          $(".user_pic").attr("src", url);
+        });
+
+        // 页面一进来  就显示登录用户的信息
+        $.ajax({
+          type: "get",
+          url: "http://127.0.0.1:8080/admin/user/detail",
+          success: function(data) {
+            // console.log(data);
+            $("input.username").val(data.data.username);
+            $("input.nickname").val(data.data.nickname);
+            $("input.email").val(data.data.email);
+            $("input.password").val(data.data.password);
+            $(".user_pic").attr("src", data.data.userPic);
+          }
+        });
+
+        //  用户信息修改
+        $(".btn-edit").on("click", function(e) {
+          //   阻止submit 跳转事件
+          e.preventDefault();
+          //   创建一个 FormData对象
+          var fd = new FormData($("form")[0]);
+          //   发送ajax请求
+          $.ajax({
+            type: "post",
+            url: "http://127.0.0.1:8080/admin/user/edit",
+            data: fd,
+            contentType: false,
+            processData: false,
+            success: function(data) {
+              if (data.code == 200) {
+                //   提示 修改成功
+                alert("修改成功!");
+                // 发送ajax 请求  将修改完的信息渲染上去
+                $.ajax({
+                  type: "get",
+                  url: "http://127.0.0.1:8080/admin/user/info",
+                  success: function(data) {
+                    // console.log(data);
+                    if (data.code == 200) {
+                      // 将对应的信息渲染上去
+                      parent.$(".user_info>img").attr("src", data.data.userPic);
+                      parent
+                        .$(".user_info>span")
+                        .html("欢迎&nbsp;&nbsp;" + data.data.nickname);
+                      parent
+                        .$(".user_center_link>img")
+                        .attr("src", data.data.userPic);
+                      // 页面刷新
+                      // parent.window.location.reload();
+                      window.location.href ='index.html'
+                    }
+                  }
+                });
+              }
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

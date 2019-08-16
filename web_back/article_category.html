@@ -135,13 +135,23 @@
                 <label for="recipient-name" class="control-label"
                   >分类名称:</label
                 >
-                <input type="text" class="form-control" name="name" id="recipient-name" />
+                <input
+                  type="text"
+                  class="form-control"
+                  name="name"
+                  id="recipient-name"
+                />
               </div>
               <div class="form-group">
                 <label for="message-text" class="control-label"
                   >分类别名:</label
                 >
-                <input type="text" class="form-control" name="slug" id="recipient-slug" />
+                <input
+                  type="text"
+                  class="form-control"
+                  name="slug"
+                  id="recipient-slug"
+                />
               </div>
             </form>
           </div>
@@ -213,7 +223,7 @@
         }
         getData();
         //   新增类别
-        //  给新增按钮 设置一个点击事件 
+        //  给新增按钮 设置一个点击事件
         $("#model_add").on("click", function() {
           // 判断点前点击是  是新增 还是 修改
           if ($(this).hasClass("btn-success")) {
@@ -229,14 +239,20 @@
               // dataType:"json",
               data: data,
               success: function(data) {
-                alert('修改成功!')
+                alert("修改成功!");
                 getData();
+                // 隐藏模态框
+                $("#addModal").modal("hide");
               }
             });
           } else {
             // 获取输入的文章类别
-            var catename = $("#recipient-name").val().trim();
-            var cateslug = $("#recipient-slug").val().trim();
+            var catename = $("#recipient-name")
+              .val()
+              .trim();
+            var cateslug = $("#recipient-slug")
+              .val()
+              .trim();
             //  判断输入是否为空
             if (catename == "" || cateslug == "") {
               alert("输入内容不能为空!");
@@ -253,8 +269,8 @@
               success: function(data) {
                 getData();
                 // 新增完成后 清空输入框
-                $("#recipient-name").val('')
-                $("#recipient-slug").val('')
+                $("#recipient-name").val("");
+                $("#recipient-slug").val("");
               }
             });
             // 隐藏模态框

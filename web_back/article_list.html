@@ -298,17 +298,33 @@
       //  入口函数
       $(function() {
         //一进来就发送ajax请求  渲染文章数据  并且封装成函数 方便复用
-        function getData(myPage) {
+        function getData(myPage,cateType,cateState) {
           $.ajax({
             url: "http://localhost:8080/admin/article/query",
             data: {
+              type:cateType,
+              state:cateState,
               page: myPage,
               perpage: 5
             },
             success: function(data) {
-            //   console.log(data);
+              //   console.log(data);
               var resHtml = template("atc", data);
               $("tbody").html(resHtml);
+              // 根据发送ajax请求 获取到的总页数 来重新绘制页码条
+              var totalPages = data.data.totalPage;
+              // 判断 如果ajax 请求 获取的总页数 和刚才的总页数不等 就重新绘制页码条
+              if(totalPages != myTotalPage || isOK == true){
+                myTotalPage = totalPages;
+                // 获取当前页码
+                var currentPage = $pagination.twbsPagination('getCurrentPage');
+                $pagination.twbsPagination('destroy');
+                $pagination.twbsPagination($.extend({},defaultOpts,{
+                  startPage:1,
+                  totalPages:totalPages
+                }))
+                isOK = false;
+              }
             }
           });
         }
@@ -325,14 +341,34 @@
           }
         });
 
+        var cateType;
+        var cateState;
+        var myTotalPage = 40;
+        var isOK = false;
+
         // 分页功能
-        $(".pagination").twbsPagination({
-          totalPages: 50,
-          visiblePages: 5,
+        // $(".pagination").twbsPagination({
+        //   totalPages: 50,
+        //   visiblePages: 5,
+        //   onPageClick: function(event, page) {
+        //     getData(page);
+        //   }
+        // });
+        //  分页
+        var $pagination = $(".pagination");
+        var defaultOpts = {
+          first: "首页",
+          prev: "上一页",
+          next: "下一页",
+          last: "末页",
+          totalPages: myTotalPage, // 总页数
+          visiblePages: 5, // 每页显示的文章数
           onPageClick: function(event, page) {
-            getData(page);
+            getData(page, cateType, cateState);
           }
-        });
+        };
+
+        $(".pagination").twbsPagination(defaultOpts);
 
         // 点击 筛选按钮  筛选除符合条件的文章 渲染到页面
         // 给筛选按钮设置点击事件
@@ -341,24 +377,26 @@
           e.preventDefault();
           // 获取筛选条件
           // 修改下拉菜单的value值
-          var cateType =  $("#selCategory").val(); // 所有分类
-          var cateState = $("#selStatus").val(); // 所有状态
-         console.log(cateType , cateState);
+          isOK = true;
+          cateType = $("#selCategory").val(); // 所有分类
+          cateState = $("#selStatus").val(); // 所有状态
+          console.log(cateType, cateState);
           //  发送ajax请求  获取到符合条件的文章
-          $.ajax({
-            url: "http://localhost:8080/admin/article/query",
-            data: {
-              type: cateType,
-              state: cateState,
-              page: 1,
-              perpage: 5
-            },
-            success: function(data) {
-                console.log(data);
-              var resHtml = template("atc", data);
-              $("tbody").html(resHtml);
-            }
-          });
+          // $.ajax({
+          //   url: "http://localhost:8080/admin/article/query",
+          //   data: {
+          //     type: cateType,
+          //     state: cateState,
+          //     page: 1,
+          //     perpage: 5
+          //   },
+          //   success: function(data) {
+          //     console.log(data);
+          //     var resHtml = template("atc", data);
+          //     $("tbody").html(resHtml);
+          //   }
+          // });
+          getData(1,cateType,cateState)
         });
       });
     </script>
